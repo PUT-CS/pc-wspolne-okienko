@@ -1,14 +1,20 @@
 import express from "express";
-import { getLogger } from "@/logger";
+import { getLogger, logRequest } from "@/logger";
+import { handleGetCalendar } from "@/handlers/getCalendar";
 
 const logger = getLogger();
 
 function main() {
   const app = express();
 
-  app.get("/", (req, res) => {
-    res.send("Hello World!");
+  app.use((request, response, next) => {
+    logRequest(request, logger);
+    next();
   });
+
+  app.get("/calendar", (request, response) =>
+    handleGetCalendar(request, response, logger),
+  );
 
   app.listen(3000, (error) => {
     if (error) {

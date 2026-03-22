@@ -1,0 +1,17 @@
+version: 3
+
+dotenv:
+  - .env
+
+tasks:
+  dev:
+    env:
+      NODE_ENV: development
+    cmds:
+      - npm run dev
+
+  run:
+    env:
+      NODE_ENV: production
+    cmds:
+      - npm run start
