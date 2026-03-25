@@ -1,11 +1,13 @@
+use crate::calendar::Calendar;
 use axum::extract::Query;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct GetCalendarQueryParams {
     url: String,
 }
 
+#[tracing::instrument]
 pub async fn handle_get_calendar(Query(params): Query<GetCalendarQueryParams>) -> String {
-    format!("You requested the calendar at URL: {}", params.url)
+    Calendar::from_url(&params.url).await
 }

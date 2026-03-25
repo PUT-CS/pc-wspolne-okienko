@@ -7,3 +7,8 @@ edition = "2024"
 axum = "0.8.8"
 tokio = { version = "1.50.0", features = ["rt-multi-thread"] }
 serde = { version = "1.0.228", features = ["derive"] }
+chrono = { version = "0.4.44", features = ["serde"] }
+ical = { version = "0.11.0", features = ["ical"] }
+reqwest = "0.13.2"
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"

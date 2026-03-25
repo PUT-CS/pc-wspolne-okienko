@@ -1,2 +1,2 @@
-pub mod get_calendar;
 pub mod fallback;
+pub mod get_calendar;
