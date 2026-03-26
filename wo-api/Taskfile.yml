@@ -1,0 +1,19 @@
+version: 3
+
+tasks:
+  docker:build:
+    desc: Build the API
+    cmds:
+      - docker build -t wo-api:latest .
+
+  docker:stop:
+    desc: Stop and remove existing API container if present
+    cmds:
+      - docker stop wo-api 2>/dev/null || true
+      - docker rm wo-api 2>/dev/null || true
+
+  docker:run:
+    desc: Run the API
+    deps: [ docker:build, docker:stop ]
+    cmds:
+      - docker run --rm -p 3000:3000 --name wo-api wo-api:latest

@@ -1,10 +1,13 @@
 mod api;
 mod calendar;
+mod app_config;
 
 use crate::api::handlers::fallback::handle_fallback;
+use crate::app_config::AppConfig;
 use api::handlers::get_calendar::handle_get_calendar;
 use axum::routing::get;
 use axum::Router;
+use tokio::signal;
 use tracing::{info, Level};
 
 #[tokio::main]
@@ -18,15 +21,46 @@ async fn main() {
     tracing::subscriber::set_global_default(subscriber)
         .expect("setting default subscriber should work");
 
+    let config = AppConfig::from_env().expect("Failed to load configuration");
+
     let app = Router::new()
         .route("/calendar", get(handle_get_calendar))
         .fallback(handle_fallback);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+    let listener = tokio::net::TcpListener::bind(config.socket_addr())
         .await
         .unwrap();
 
-    info!("Server running on {}", listener.local_addr().unwrap());
+    info!(
+        socket_addr = listener.local_addr().unwrap().to_string(),
+        "Server starting..."
+    );
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await.unwrap();
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
 }
