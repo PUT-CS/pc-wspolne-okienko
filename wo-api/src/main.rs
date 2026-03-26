@@ -1,14 +1,14 @@
 mod api;
-mod calendar;
 mod app_config;
+mod calendar;
 
 use crate::api::handlers::fallback::handle_fallback;
 use crate::app_config::AppConfig;
 use api::handlers::get_calendar::handle_get_calendar;
-use axum::routing::get;
 use axum::Router;
+use axum::routing::get;
 use tokio::signal;
-use tracing::{info, Level};
+use tracing::{Level, info};
 
 #[tokio::main]
 async fn main() {
@@ -38,7 +38,8 @@ async fn main() {
 
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
-        .await.unwrap();
+        .await
+        .unwrap();
 }
 
 async fn shutdown_signal() {

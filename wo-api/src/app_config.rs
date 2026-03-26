@@ -24,10 +24,7 @@ impl AppConfig {
 
         info!(?address, ?port, "AppConfig loaded");
 
-        Ok(AppConfig {
-            address,
-            port,
-        })
+        Ok(AppConfig { address, port })
     }
 
     pub fn socket_addr(&self) -> SocketAddr {
