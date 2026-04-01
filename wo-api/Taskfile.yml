@@ -1,8 +1,22 @@
 version: 3
 
+dotenv:
+  - .env
+
 tasks:
+  dev:
+    env:
+      NODE_ENV: development
+    cmds:
+      - npm run dev
+
+  run:
+    env:
+      NODE_ENV: production
+    cmds:
+      - npm run start
+
   docker:build:
-    desc: Build the API
     cmds:
       - docker build -t wo-api:latest .
 
