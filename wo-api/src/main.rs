@@ -5,8 +5,10 @@ mod calendar;
 use crate::api::handlers::fallback::handle_fallback;
 use crate::app_config::AppConfig;
 use api::handlers::get_calendar::handle_get_calendar;
+use api::handlers::join_lobby::handle_join_lobby;
+use api::handlers::create_lobby::handle_create_lobby;
 use axum::Router;
-use axum::routing::get;
+use axum::routing::{get, post};
 use tokio::signal;
 use tracing::{Level, info};
 
@@ -25,6 +27,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/calendar", get(handle_get_calendar))
+        .route("/create-lobby", post(handle_create_lobby))
+        .route("/join-lobby", post(handle_join_lobby))
         .fallback(handle_fallback);
 
     let listener = tokio::net::TcpListener::bind(config.socket_addr())
