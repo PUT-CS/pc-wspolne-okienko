@@ -10,14 +10,14 @@ pub struct Calendars {
     calendars: Vec<Calendar>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Calendar {
     name: String,
     timezone: String,
     events: Vec<Event>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Event {
     id: String,
     summary: String,

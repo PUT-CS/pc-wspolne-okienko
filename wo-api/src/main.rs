@@ -1,6 +1,7 @@
 mod api;
 mod app_config;
 mod calendar;
+mod lobby;
 
 use crate::api::handlers::fallback::handle_fallback;
 use crate::app_config::AppConfig;
@@ -27,8 +28,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/calendar", get(handle_get_calendar))
-        .route("/create-lobby", post(handle_create_lobby))
-        .route("/join-lobby", post(handle_join_lobby))
+        .route("/lobby", post(handle_create_lobby))
+        .route("/join", post(handle_join_lobby))
         .fallback(handle_fallback);
 
     let listener = tokio::net::TcpListener::bind(config.socket_addr())
