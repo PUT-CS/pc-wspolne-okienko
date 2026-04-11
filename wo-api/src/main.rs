@@ -12,9 +12,11 @@ use crate::db::connect;
 use api::handlers::create_lobby::handle_create_lobby;
 use api::handlers::get_calendar::handle_get_calendar;
 use api::handlers::join_lobby::handle_join_lobby;
+use axum::http::Method;
 use axum::routing::{get, post};
 use axum::Router;
 use tokio::signal;
+use tower_http::cors::{Any, CorsLayer};
 use tracing::{info, Level};
 
 #[tokio::main]
@@ -34,12 +36,18 @@ async fn main() {
         .await
         .expect("Failed to connect to PostgreSQL");
 
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+        .allow_headers(Any);
+
     let app = Router::new()
         .route("/health", get(handle_health))
         .route("/calendar", get(handle_get_calendar))
         .route("/lobby", post(handle_create_lobby))
         .route("/join", post(handle_join_lobby))
         .fallback(handle_fallback)
+        .layer(cors)
         .with_state(db_pool);
 
     let listener = tokio::net::TcpListener::bind(config.socket_addr())

@@ -1,24 +1,27 @@
-import { useState } from 'react'
+import { Link, Navigate, Route, Routes } from 'react-router-dom'
+import { LobbyCreatePage } from './pages/LobbyCreatePage'
+
+function HomePage() {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-3xl items-center justify-center p-6">
+      <div className="space-y-4 text-center">
+        <h1 className="text-3xl font-semibold tracking-tight">Wspolne Okienko</h1>
+        <p className="text-sm text-zinc-500">Create and share your lobby in one click.</p>
+        <Link className="text-sm font-medium text-zinc-900 underline" to="/lobby">
+          Go to lobby form
+        </Link>
+      </div>
+    </main>
+  )
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000'
-
   return (
-    <>
-      <section id="center">
-        <p>API: {apiBaseUrl}</p>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/lobby" element={<LobbyCreatePage />} />
+      <Route path="*" element={<Navigate replace to="/lobby" />} />
+    </Routes>
   )
 }
 
