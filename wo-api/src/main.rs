@@ -3,7 +3,7 @@ mod app_config;
 mod calendar;
 mod db;
 mod lobby;
-mod validate;
+mod validated;
 
 use crate::api::handlers::fallback::handle_fallback;
 use crate::app_config::AppConfig;

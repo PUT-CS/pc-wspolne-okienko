@@ -3,14 +3,14 @@ use axum::Json;
 use serde::Deserialize;
 
 use crate::lobby::Lobby;
-use crate::validate::{Validate, ValidateError};
+use crate::validated::{ValidateError, Validated};
 
 #[derive(Debug, Deserialize)]
 pub struct CreateLobbyRequest {
     name: String,
 }
 
-impl Validate for CreateLobbyRequest {
+impl Validated for CreateLobbyRequest {
     fn validate(&self) -> Result<(), ValidateError> {
         if self.name.trim().is_empty() {
             return Err(ValidateError::Invalid("Lobby name cannot be empty".into()));

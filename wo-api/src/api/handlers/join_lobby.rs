@@ -2,7 +2,7 @@ use axum::http::StatusCode;
 use axum::Json;
 
 use crate::lobby::{Lobby, User};
-use crate::validate::Validate;
+use crate::validated::Validated;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct JoinLobbyRequest {
@@ -11,22 +11,22 @@ pub struct JoinLobbyRequest {
     user: User,
 }
 
-impl Validate for JoinLobbyRequest {
-    fn validate(&self) -> Result<(), crate::validate::ValidateError> {
+impl Validated for JoinLobbyRequest {
+    fn validate(&self) -> Result<(), crate::validated::ValidateError> {
         if self.lobby_id.trim().is_empty() {
-            return Err(crate::validate::ValidateError::Invalid("Lobby ID cannot be empty".into()));
+            return Err(crate::validated::ValidateError::Invalid("Lobby ID cannot be empty".into()));
         }
         if self.lobby_id.len() != Lobby::ID_LENGTH {
-            return Err(crate::validate::ValidateError::Invalid(format!("Lobby ID must be {} characters long", Lobby::ID_LENGTH)));
+            return Err(crate::validated::ValidateError::Invalid(format!("Lobby ID must be {} characters long", Lobby::ID_LENGTH)));
         }
         if self.lobby_name.trim().is_empty() {
-            return Err(crate::validate::ValidateError::Invalid("Lobby name cannot be empty".into()));
+            return Err(crate::validated::ValidateError::Invalid("Lobby name cannot be empty".into()));
         }
         if self.user.id.trim().is_empty() {
-            return Err(crate::validate::ValidateError::Invalid("User ID cannot be empty".into()));
+            return Err(crate::validated::ValidateError::Invalid("User ID cannot be empty".into()));
         }
         if self.user.name.trim().is_empty() {
-            return Err(crate::validate::ValidateError::Invalid("User name cannot be empty".into()));
+            return Err(crate::validated::ValidateError::Invalid("User name cannot be empty".into()));
         }
         Ok(())
     }

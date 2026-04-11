@@ -1,5 +1,5 @@
 use crate::calendar::{Calendar, Calendars};
-use crate::validate::Validate;
+use crate::validated::Validated;
 use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::Json;
@@ -10,13 +10,13 @@ pub struct GetCalendarQueryParams {
     url: String,
 }
 
-impl Validate for GetCalendarQueryParams {
-    fn validate(&self) -> Result<(), crate::validate::ValidateError> {
+impl Validated for GetCalendarQueryParams {
+    fn validate(&self) -> Result<(), crate::validated::ValidateError> {
         if self.url.trim().is_empty() {
-            return Err(crate::validate::ValidateError::Invalid("URL cannot be empty".into()));
+            return Err(crate::validated::ValidateError::Invalid("URL cannot be empty".into()));
         }
         if url::Url::parse(&self.url).is_err() {
-            return Err(crate::validate::ValidateError::Invalid("Invalid URL format".into()));
+            return Err(crate::validated::ValidateError::Invalid("Invalid URL format".into()));
         }
         Ok(())
     }
