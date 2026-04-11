@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -23,20 +24,17 @@ async function copyJoinLink(joinUrl: string): Promise<CopyStatus> {
   }
 }
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown error'
+}
+
 export function LobbyCreatePage() {
   const [name, setName] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    setError(null)
-    setIsLoading(true)
-
-    try {
-      const lobby = await createLobby(name)
+  const createLobbyMutation = useMutation({
+    mutationFn: createLobby,
+    onSuccess: async (lobby) => {
       const joinUrl = `${window.location.origin}/join/${lobby.id}`
       const copyStatus = await copyJoinLink(joinUrl)
 
@@ -48,12 +46,12 @@ export function LobbyCreatePage() {
           copyStatus,
         },
       })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(message)
-    } finally {
-      setIsLoading(false)
-    }
+    },
+  })
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    createLobbyMutation.mutate(name)
   }
 
   return (
@@ -76,14 +74,14 @@ export function LobbyCreatePage() {
                 required
               />
             </div>
-            <Button disabled={isLoading} type="submit">
-              {isLoading ? 'Creating...' : 'Create lobby'}
+            <Button disabled={createLobbyMutation.isPending} type="submit">
+              {createLobbyMutation.isPending ? 'Creating...' : 'Create lobby'}
             </Button>
           </form>
 
-          {error && (
+          {createLobbyMutation.error && (
             <p className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              Failed to create lobby: {error}
+              Failed to create lobby: {getErrorMessage(createLobbyMutation.error)}
             </p>
           )}
 
