@@ -1,5 +1,6 @@
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import { LobbyCreatePage } from './pages/LobbyCreatePage'
+import { LobbyDetailsPage } from './pages/LobbyDetailsPage'
 
 function HomePage() {
   return (
@@ -20,6 +21,8 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/lobby" element={<LobbyCreatePage />} />
+      <Route path="/lobby/:id" element={<LobbyDetailsPage />} />
+      <Route path="/join/:id" element={<LobbyDetailsPage />} />
       <Route path="*" element={<Navigate replace to="/lobby" />} />
     </Routes>
   )

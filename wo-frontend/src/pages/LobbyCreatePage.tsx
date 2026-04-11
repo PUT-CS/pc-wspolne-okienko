@@ -1,30 +1,53 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
-import { createLobby, type LobbyResponse } from '../lib/api'
+import { createLobby } from '../lib/api'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 
+type CopyStatus = 'copied' | 'failed'
+
+async function copyJoinLink(joinUrl: string): Promise<CopyStatus> {
+  if (!navigator.clipboard?.writeText) {
+    return 'failed'
+  }
+
+  try {
+    await navigator.clipboard.writeText(joinUrl)
+    return 'copied'
+  } catch {
+    return 'failed'
+  }
+}
+
 export function LobbyCreatePage() {
   const [name, setName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [createdLobby, setCreatedLobby] = useState<LobbyResponse | null>(null)
+  const navigate = useNavigate()
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     setError(null)
-    setCreatedLobby(null)
     setIsLoading(true)
 
     try {
       const lobby = await createLobby(name)
-      setCreatedLobby(lobby)
+      const joinUrl = `${window.location.origin}/join/${lobby.id}`
+      const copyStatus = await copyJoinLink(joinUrl)
+
       setName('')
+      navigate(`/lobby/${lobby.id}`, {
+        state: {
+          name: lobby.name,
+          joinUrl,
+          copyStatus,
+        },
+      })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       setError(message)
@@ -62,14 +85,6 @@ export function LobbyCreatePage() {
             <p className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
               Failed to create lobby: {error}
             </p>
-          )}
-
-          {createdLobby && (
-            <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
-              <p className="font-medium">Lobby created</p>
-              <p>ID: {createdLobby.id}</p>
-              <p>Name: {createdLobby.name}</p>
-            </div>
           )}
 
           <Link className="mt-4 inline-block text-sm text-zinc-600 underline" to="/">
