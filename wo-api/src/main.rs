@@ -6,6 +6,7 @@ mod lobby;
 mod validated;
 
 use crate::api::handlers::fallback::handle_fallback;
+use crate::api::handlers::health::handle_health;
 use crate::app_config::AppConfig;
 use crate::db::connect;
 use api::handlers::create_lobby::handle_create_lobby;
@@ -34,6 +35,7 @@ async fn main() {
         .expect("Failed to connect to PostgreSQL");
 
     let app = Router::new()
+        .route("/health", get(handle_health))
         .route("/calendar", get(handle_get_calendar))
         .route("/lobby", post(handle_create_lobby))
         .route("/join", post(handle_join_lobby))

@@ -15,7 +15,11 @@ COPY src src
 # Force rebuild to include the actual source code
 RUN touch src/main.rs && cargo build --release
 
-FROM gcr.io/distroless/cc-debian12
+FROM debian:bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

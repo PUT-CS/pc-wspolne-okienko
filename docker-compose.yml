@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-wo}
+      POSTGRES_USER: ${POSTGRES_USER:-wo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wo_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./wo-db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wo_user} -d ${POSTGRES_DB:-wo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - wo-network
+
+  wo-api:
+    build:
+      context: ./wo-api
+      dockerfile: Dockerfile
+    container_name: wo-api
+    restart: unless-stopped
+    environment:
+      ADDRESS: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-wo_user}:${POSTGRES_PASSWORD:-wo_password}@postgres:5432/${POSTGRES_DB:-wo}
+      DB_MAX_CONNECTIONS: ${DB_MAX_CONNECTIONS:-10}
+      RUST_LOG: ${RUST_LOG:-debug}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - wo-network
+
+  wo-frontend:
+    build:
+      context: ./wo-frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000}
+    container_name: wo-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      wo-api:
+        condition: service_healthy
+    networks:
+      - wo-network
+
+networks:
+  wo-network:
+    name: wo-network
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: wo-postgres-data
