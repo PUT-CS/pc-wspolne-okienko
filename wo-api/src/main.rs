@@ -3,6 +3,7 @@ mod app_config;
 mod calendar;
 mod db;
 mod lobby;
+mod validated;
 
 use crate::api::handlers::fallback::handle_fallback;
 use crate::app_config::AppConfig;
@@ -10,10 +11,10 @@ use crate::db::connect;
 use api::handlers::create_lobby::handle_create_lobby;
 use api::handlers::get_calendar::handle_get_calendar;
 use api::handlers::join_lobby::handle_join_lobby;
-use axum::Router;
 use axum::routing::{get, post};
+use axum::Router;
 use tokio::signal;
-use tracing::{Level, info};
+use tracing::{info, Level};
 
 #[tokio::main]
 async fn main() {
