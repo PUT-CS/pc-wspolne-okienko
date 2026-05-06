@@ -12,6 +12,7 @@ use crate::db::connect;
 use api::handlers::create_lobby::handle_create_lobby;
 use api::handlers::get_calendar::handle_get_calendar;
 use api::handlers::join_lobby::handle_join_lobby;
+use api::handlers::get_lobby_users::handle_get_lobby_users;
 use axum::http::Method;
 use axum::routing::{get, post};
 use axum::Router;
@@ -45,6 +46,7 @@ async fn main() {
         .route("/health", get(handle_health))
         .route("/calendar", get(handle_get_calendar))
         .route("/lobby", post(handle_create_lobby))
+        .route("/lobby/{lobby_id}/users", get(handle_get_lobby_users))
         .route("/join", post(handle_join_lobby))
         .fallback(handle_fallback)
         .layer(cors)

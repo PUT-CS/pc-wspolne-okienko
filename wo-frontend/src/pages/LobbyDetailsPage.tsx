@@ -1,5 +1,6 @@
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom'
 
+import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 
 type CopyStatus = 'copied' | 'failed'
@@ -13,6 +14,7 @@ type LobbyNavigationState = {
 export function LobbyDetailsPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
+  const navigate = useNavigate()
   const state = location.state as LobbyNavigationState | null
 
   const joinUrl = state?.joinUrl ?? (id ? `${window.location.origin}/join/${id}` : null)
@@ -41,9 +43,14 @@ export function LobbyDetailsPage() {
               {state?.copyStatus === 'failed' && <p className="mt-1 text-amber-700">Clipboard blocked. Copy link manually.</p>}
             </div>
           )}
-          <Link className="inline-block text-sm text-zinc-600 underline" to="/lobby">
-            Create another lobby
-          </Link>
+          <div className="flex gap-2 pt-2">
+            <Button onClick={() => id && navigate(`/schedule/${id}`)}>
+              View Schedule
+            </Button>
+            <Link to="/lobby">
+              <Button variant="outline">Create another lobby</Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </main>
