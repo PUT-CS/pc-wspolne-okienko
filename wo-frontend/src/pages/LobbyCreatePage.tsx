@@ -1,57 +1,63 @@
-import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
-import type { FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { createLobby } from '../lib/api'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
+import { createLobby } from '../lib/api';
+import { Button } from '../components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 
-type CopyStatus = 'copied' | 'failed'
+type CopyStatus = 'copied' | 'failed';
 
 async function copyJoinLink(joinUrl: string): Promise<CopyStatus> {
   if (!navigator.clipboard?.writeText) {
-    return 'failed'
+    return 'failed';
   }
 
   try {
-    await navigator.clipboard.writeText(joinUrl)
-    return 'copied'
+    await navigator.clipboard.writeText(joinUrl);
+    return 'copied';
   } catch {
-    return 'failed'
+    return 'failed';
   }
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Unknown error'
+  return error instanceof Error ? error.message : 'Unknown error';
 }
 
 export function LobbyCreatePage() {
-  const [name, setName] = useState('')
-  const navigate = useNavigate()
+  const [name, setName] = useState('');
+  const navigate = useNavigate();
 
   const createLobbyMutation = useMutation({
     mutationFn: createLobby,
     onSuccess: async (lobby) => {
-      const joinUrl = `${window.location.origin}/join/${lobby.id}`
-      const copyStatus = await copyJoinLink(joinUrl)
+      const joinUrl = `${window.location.origin}/join/${lobby.id}`;
+      const copyStatus = await copyJoinLink(joinUrl);
 
-      setName('')
+      setName('');
       navigate(`/lobby/${lobby.id}`, {
         state: {
           name: lobby.name,
           joinUrl,
           copyStatus,
         },
-      })
+      });
     },
-  })
+  });
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    createLobbyMutation.mutate(name)
+    event.preventDefault();
+    createLobbyMutation.mutate(name);
   }
 
   return (
@@ -59,7 +65,9 @@ export function LobbyCreatePage() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Create lobby</CardTitle>
-          <CardDescription>Create a new lobby and store it in PostgreSQL.</CardDescription>
+          <CardDescription>
+            Create a new lobby and store it in PostgreSQL.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -81,15 +89,19 @@ export function LobbyCreatePage() {
 
           {createLobbyMutation.error && (
             <p className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              Failed to create lobby: {getErrorMessage(createLobbyMutation.error)}
+              Failed to create lobby:{' '}
+              {getErrorMessage(createLobbyMutation.error)}
             </p>
           )}
 
-          <Link className="mt-4 inline-block text-sm text-zinc-600 underline" to="/">
+          <Link
+            className="mt-4 inline-block text-sm text-zinc-600 underline"
+            to="/"
+          >
             Back to home
           </Link>
         </CardContent>
       </Card>
     </main>
-  )
+  );
 }
