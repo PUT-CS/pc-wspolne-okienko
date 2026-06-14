@@ -34,6 +34,9 @@ export function WeeklyCalendar({
       userId: string;
       startRow: number;
       rowSpan: number;
+      activity: string;
+      startTime: string;
+      endTime: string;
     }> = [];
 
     userSchedules.forEach((timeSlots, userId) => {
@@ -45,6 +48,9 @@ export function WeeklyCalendar({
           userId,
           startRow,
           rowSpan,
+          activity: slot.activity,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
         });
       });
     });
@@ -109,15 +115,22 @@ export function WeeklyCalendar({
                   return (
                     <div
                       key={`block-${day}-${block.userId}-${block.startRow}`}
-                      className="border border-zinc-400 rounded-sm"
+                      className="border border-zinc-400 rounded-sm p-1 flex flex-col justify-start overflow-hidden"
                       style={{
                         gridRow: `${block.startRow + 1} / span ${block.rowSpan}`,
                         backgroundColor: color,
                         opacity: 0.85,
                         zIndex: 10,
                       }}
-                      title={`User: ${block.userId}`}
-                    />
+                      title={`${block.activity} (${block.startTime}-${block.endTime})`}
+                    >
+                      <div className="text-xs font-semibold text-zinc-900 truncate">
+                        {block.activity}
+                      </div>
+                      <div className="text-xs text-zinc-800">
+                        {block.startTime}-{block.endTime}
+                      </div>
+                    </div>
                   );
                 })}
             </div>
